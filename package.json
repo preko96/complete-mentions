@@ -11,6 +11,7 @@
   ],
   "author": "Istvan Orban",
   "license": "MIT",
+  "homepage": "https://github.com/preko96/complete-mentions",
   "devDependencies": {
     "@types/react": "^16.9.11",
     "@types/react-native": "^0.60.22",
