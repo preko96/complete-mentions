@@ -1,0 +1,24 @@
+{
+  "name": "complete-mentions",
+  "version": "1.0.0",
+  "description": "A complete mentions system for React Native apps",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react-native;mentions;tags"
+  ],
+  "author": "Istvan Orban",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^16.9.11",
+    "@types/react-native": "^0.60.22",
+    "metro-react-native-babel-preset": "^0.57.0",
+    "typescript": "^3.6.4"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "react": "16.8.0"
+  }
+}
