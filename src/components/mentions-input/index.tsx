@@ -1,4 +1,5 @@
 import React, {
+  MutableRefObject,
   PropsWithChildren,
   ReactNode,
   RefObject,
@@ -12,18 +13,20 @@ import { Text, TextInput, TextInputProps } from "react-native";
 import MentionInputContext from "../../context/mentionInputContext";
 
 type MentionInputProps = TextInputProps & {
+  inputRef?: MutableRefObject<TextInput>;
   onExtractedStringChange?: (text: string) => void;
 };
 
 export default function MentionInput(
   props: PropsWithChildren<MentionInputProps>
 ) {
-  const inputRef = useRef<TextInput>() as RefObject<TextInput>;
+  const inputRef = useRef<TextInput>();
   const {
     value,
     onChangeText,
     onSelectionChange,
     onExtractedStringChange,
+    inputRef: propInputRef,
     ...otherProps
   } = props;
 
@@ -71,7 +74,10 @@ export default function MentionInput(
       {props.children}
       <TextInput
         {...otherProps}
-        ref={inputRef}
+        ref={ref => {
+          inputRef.current = ref;
+          propInputRef.current = ref;
+        }}
         multiline
         onChangeText={handleChangeText}
         onSelectionChange={handleSelectionChange}
