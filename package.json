@@ -1,6 +1,6 @@
 {
   "name": "complete-mentions",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A complete mentions system for React Native apps",
   "main": "index.ts",
   "scripts": {
