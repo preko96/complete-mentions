@@ -1,13 +1,13 @@
-import { GenericHandler } from "./types";
+import { GenericHandler } from './types';
 
-export type TrackingParams = { tag: string; }
-type CommitSub = (commitResult?: Commitment) => void;
+export type TrackingParams = { tag: string };
+type CommitSub = (commitResult: Commitment) => void;
 type KeywordChangeSub = (keyword: string) => void;
 type TrackingEvents = {
-  (type: "commit", sub: CommitSub): void;
-  (type: "startTracking", sub: Function): void;
-  (type: "stopTracking", sub: Function): void;
-  (type: "keywordChange", sub: KeywordChangeSub): void;
+  (type: 'commit', sub: CommitSub): void;
+  (type: 'startTracking', sub: Function): void;
+  (type: 'stopTracking', sub: Function): void;
+  (type: 'keywordChange', sub: KeywordChangeSub): void;
 };
 
 type TrackingHandler = {
@@ -20,7 +20,7 @@ export type CommitParam = {
   text: string;
   name: string;
   id: string;
-  formatText: (text: string) => string;
+  formatText?: (text: string) => string;
 };
 
 export type Commitment = {
@@ -36,7 +36,7 @@ export type Commitment = {
 export default function createTrackingHandler(params: TrackingParams): TrackingHandler {
   let trackingQueue: boolean[] = [false];
   let position: number = -1;
-  let keyword: string = "";
+  let keyword: string = '';
 
   const commitSubs: CommitSub[] = [];
   const startTrackingSubs: Function[] = [];
@@ -45,15 +45,11 @@ export default function createTrackingHandler(params: TrackingParams): TrackingH
 
   const stopTracking = () => {
     position = -1;
-    keyword = "";
+    keyword = '';
     trackingQueue = [false, ...trackingQueue];
   };
 
-  const preHandleTrackingState: GenericHandler = ({
-    text,
-    selection,
-    prevSelection
-  }) => {
+  const preHandleTrackingState: GenericHandler = ({ text, selection, prevSelection }) => {
     const lastChar = text[selection.start - 1];
     const ranged = prevSelection.start !== prevSelection.end;
     const [tracking] = trackingQueue;
@@ -64,12 +60,11 @@ export default function createTrackingHandler(params: TrackingParams): TrackingH
       }
     } else {
       if (ranged) stopTracking();
-      else if (lastChar === " ") stopTracking();
+      else if (lastChar === ' ') stopTracking();
       else if (selection.start - 1 < position) stopTracking();
     }
 
-    if (tracking === trackingQueue[0])
-      trackingQueue = [tracking, ...trackingQueue];
+    if (tracking === trackingQueue[0]) trackingQueue = [tracking, ...trackingQueue];
   };
 
   const postHandleTrackingState: GenericHandler = ({ selection }) => {
@@ -81,10 +76,12 @@ export default function createTrackingHandler(params: TrackingParams): TrackingH
 
   const updateKeyword: GenericHandler = ({ text }) => {
     if (position !== -1) {
-      keyword = /([^\s]+)/.exec(text.substr(position))[0];
+      const match = /([^\s]+)/.exec(text.substr(position));
+      if (!match) return;
+      keyword = match[0];
       keywordChangeSubs.forEach(sub => {
-        sub(keyword.split(params.tag)[1])
-      })
+        sub(keyword.split(params.tag)[1]);
+      });
     }
   };
 
@@ -95,15 +92,15 @@ export default function createTrackingHandler(params: TrackingParams): TrackingH
     check();
   };
 
-  const on: TrackingEvents = (type, sub) => {
-    if (type === "commit") {
+  const on: TrackingEvents = (type: any, sub: any) => {
+    if (type === 'commit') {
       commitSubs.push(sub);
-    } else if (type === "startTracking") {
+    } else if (type === 'startTracking') {
       startTrackingSubs.push(sub);
-    } else if (type === "stopTracking") {
+    } else if (type === 'stopTracking') {
       stopTrackingSubs.push(sub);
     } else if (type === 'keywordChange') {
-      keywordChangeSubs.push(sub)
+      keywordChangeSubs.push(sub);
     }
   };
 
@@ -121,12 +118,12 @@ export default function createTrackingHandler(params: TrackingParams): TrackingH
     }
   };
 
-  const commit = ({ text, name, id, formatText }) => {
+  const commit = ({ text, name, id, formatText }: CommitParam) => {
     const left = text.slice(0, position);
     const right = text.slice(position + keyword.length + 1);
-    const slicedText = left + " " + right;
+    const slicedText = left + ' ' + right;
     const extractedName = formatText ? formatText(name) : name;
-    const full = left + extractedName + " " + right;
+    const full = left + extractedName + ' ' + right;
     const result = {
       keyword,
       slicedText,
@@ -134,7 +131,7 @@ export default function createTrackingHandler(params: TrackingParams): TrackingH
       id,
       text: full,
       start: position,
-      end: position + name.length
+      end: position + name.length,
     };
 
     check();

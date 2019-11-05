@@ -1,20 +1,14 @@
-import {
-  ReactElement,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState
-} from "react";
-import { CommitParam } from "../../utils/createTrackingHandler";
-import MentionInputContext from "../../context/mentionInputContext";
-import useTrackingHandler from "../../hooks/useTrackingHandler";
-import { Platform } from "react-native";
-import { Mention, RenderMention } from "../../utils/createMentionsHandler";
+import { ReactElement, ReactNode, useContext, useEffect, useState } from 'react';
+import { CommitParam } from '../../utils/createTrackingHandler';
+import MentionInputContext from '../../context/mentionInputContext';
+import useTrackingHandler from '../../hooks/useTrackingHandler';
+import { Platform } from 'react-native';
+import { Mention, RenderMention } from '../../utils/createMentionsHandler';
 
 type RenderProps = {
   tracking: boolean;
   keyword: string;
-  commit: (params: Omit<CommitParam, "text" | "formatText">) => void;
+  commit: (params: Omit<CommitParam, 'text' | 'formatText'>) => void;
 };
 
 type TagProps = {
@@ -37,50 +31,48 @@ export default function Tag(props: TagProps): ReactElement {
     onStopTracking,
     onKeywordChange,
     extractString,
-    formatText
+    formatText,
   } = props;
 
-  const { mentionsHandler, input, inputRef, syncHandler } = useContext(
-    MentionInputContext
-  );
+  const { mentionsHandler, input, inputRef, syncHandler } = useContext(MentionInputContext);
 
   const [tracking, setTracking] = useState(false);
-  const [keyword, setKeyword] = useState("");
+  const [keyword, setKeyword] = useState('');
   const trackingHandler = useTrackingHandler({ tag });
 
   useEffect(() => {
     mentionsHandler.addRenderer({
       tag,
-      renderer: renderText
+      renderer: renderText,
     });
     mentionsHandler.addExtractor({
       tag,
-      extractor: extractString
+      extractor: extractString,
     });
   });
 
   useEffect(() => {
-    syncHandler.on("sync", (textBuffer, selectionBuffer) => {
+    syncHandler.on('sync', (textBuffer, selectionBuffer) => {
       const [text, prevText] = textBuffer;
       const [selection, prevSelection] = selectionBuffer;
       trackingHandler.updateTracker({
         text,
         prevText,
         selection,
-        prevSelection
+        prevSelection,
       });
     });
   }, []);
 
   useEffect(() => {
-    trackingHandler.on("commit", result => {
+    trackingHandler.on('commit', result => {
       const { text, start, keyword, slicedText, id, name } = result;
       const extractedName = formatText ? formatText(name) : name;
 
-      if (Platform.OS === "android") {
+      if (Platform.OS === 'android') {
         syncHandler.updateSelection({
           start: start,
-          end: start + keyword.length
+          end: start + keyword.length,
         });
         syncHandler.updateText(slicedText);
         syncHandler.updateSelection({ start: start - 1, end: start - 1 });
@@ -88,18 +80,18 @@ export default function Tag(props: TagProps): ReactElement {
         syncHandler.updateText(text);
         syncHandler.updateSelection({
           start: start + extractedName.length,
-          end: start + extractedName.length
+          end: start + extractedName.length,
         });
       } else {
         syncHandler.updateSelection({
           start: start,
-          end: start + keyword.length
+          end: start + keyword.length,
         });
         syncHandler.updateSelection({ start: start - 1, end: start - 1 });
         syncHandler.updateText(slicedText);
         syncHandler.updateSelection({
           start: start + extractedName.length,
-          end: start + extractedName.length
+          end: start + extractedName.length,
         });
         syncHandler.updateText(text);
       }
@@ -110,43 +102,43 @@ export default function Tag(props: TagProps): ReactElement {
         name: extractedName,
         value: name,
         id,
-        tag
+        tag,
       });
 
       mentionsHandler.rerender(text);
       mentionsHandler.extract(text);
       //mentionsHandler
       // on iOS it's behaves strange... also its snaps automatically
-      if (Platform.OS === "android") {
+      if (Platform.OS === 'android') {
         inputRef.current.setNativeProps({
-          selection: { start: result.end, end: result.end }
+          selection: { start: result.end, end: result.end },
         });
       }
     });
   }, []);
 
   useEffect(() => {
-    trackingHandler.on("startTracking", () => {
+    trackingHandler.on('startTracking', () => {
       onStartTracking && onStartTracking();
       setTracking(true);
     });
-    trackingHandler.on("stopTracking", () => {
+    trackingHandler.on('stopTracking', () => {
       onStopTracking && onStopTracking();
       setTracking(false);
     });
-    trackingHandler.on("keywordChange", keyword => {
+    trackingHandler.on('keywordChange', keyword => {
       onKeywordChange && onKeywordChange(keyword);
       setKeyword(keyword);
     });
   }, []);
 
-  const handleCommit = ({ name, id }: Omit<CommitParam, "text">) => {
+  const handleCommit = ({ name, id }: Omit<CommitParam, 'text'>) => {
     trackingHandler.commit({ text: input, name, id, formatText });
   };
 
   return <ReactElement>renderSuggestions({
     commit: handleCommit,
     keyword,
-    tracking
+    tracking,
   });
 }

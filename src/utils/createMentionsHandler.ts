@@ -1,11 +1,11 @@
-import React, { ReactNode } from "react";
-import { GenericHandler } from "./types";
+import { ReactNode } from 'react';
+import { GenericHandler } from './types';
 
 type RenderSub = (nodes: ReactNode[]) => void;
 type ExtractorSub = (extractedStr: string) => void;
 type MentionEvents = {
-  (type: "render", sub: RenderSub): void;
-  (type: "extract", sub: ExtractorSub): void;
+  (type: 'render', sub: RenderSub): void;
+  (type: 'extract', sub: ExtractorSub): void;
 };
 export type MentionsHandler = {
   updateMentions: GenericHandler;
@@ -18,8 +18,6 @@ export type MentionsHandler = {
 };
 
 export type RenderMention = (mention: Mention) => ReactNode;
-
-export type CreateMentionsHandlerParam = {};
 
 export type Mention = {
   uniqueId: number;
@@ -43,22 +41,22 @@ type Extractor = {
 
 type AddRenderer = (renderer: Renderer) => void;
 type AddExtractor = (extractor: Extractor) => void;
-type AddMention = (mention: Omit<Mention, "uniqueId">) => void;
+type AddMention = (mention: Omit<Mention, 'uniqueId'>) => void;
 type Render = (text: string) => void;
 type Extract = (text: string) => void;
 
 export default function createMentionsHandler() {
-  const renderers: { [K: string]: Renderer["renderer"] } = {};
-  const extractors: { [K: string]: Extractor["extractor"] } = {};
+  const renderers: { [K: string]: Renderer['renderer'] } = {};
+  const extractors: { [K: string]: Extractor['extractor'] } = {};
 
   let uniqueId = 0;
   let mentions: Mention[] = [];
   const renderSubs: RenderSub[] = [];
   const extractorSubs: ExtractorSub[] = [];
 
-  const on: MentionEvents = (type, sub) => {
-    if (type === "render") renderSubs.push(sub);
-    else if (type === "extract") extractorSubs.push(sub);
+  const on: MentionEvents = (type: any, sub: any) => {
+    if (type === 'render') renderSubs.push(sub);
+    else if (type === 'extract') extractorSubs.push(sub);
   };
 
   const addRenderer: AddRenderer = ({ tag, renderer }) => {
@@ -74,12 +72,7 @@ export default function createMentionsHandler() {
     mentions = mentions.sort((left, right) => left.start - right.start);
   };
 
-  const handleRemove: GenericHandler = ({
-    text,
-    prevText,
-    selection,
-    prevSelection
-  }) => {
+  const handleRemove: GenericHandler = ({ text, prevText, selection, prevSelection }) => {
     // TODO: RETURN REMOVED ELEMENTS SO WE CAN HANDLE MOVING MORE ELEGANTLY
     const ranged = prevSelection.start !== prevSelection.end;
     const batch = Math.abs(selection.start - prevSelection.start) > 1;
@@ -91,15 +84,11 @@ export default function createMentionsHandler() {
     if (ranged || batch) {
       mentions = mentions.filter(mention => {
         const intersectStart =
-          prevSelection.start < mention.start &&
-          prevSelection.end > mention.start;
-        const intersectEnd =
-          prevSelection.start < mention.end && prevSelection.end > mention.end;
+          prevSelection.start < mention.start && prevSelection.end > mention.start;
+        const intersectEnd = prevSelection.start < mention.end && prevSelection.end > mention.end;
         const intersectBetween =
-          prevSelection.start >= mention.start &&
-          prevSelection.end <= mention.end;
-        const batchIntersect =
-          selection.start <= mention.start && prevSelection.end >= mention.end;
+          prevSelection.start >= mention.start && prevSelection.end <= mention.end;
+        const batchIntersect = selection.start <= mention.start && prevSelection.end >= mention.end;
 
         return !(
           intersectStart ||
@@ -110,16 +99,12 @@ export default function createMentionsHandler() {
       });
     } else if (text.length < prevText.length) {
       mentions = mentions.filter(mention => {
-        const intersects =
-          prevSelection.start > mention.start &&
-          prevSelection.end <= mention.end;
+        const intersects = prevSelection.start > mention.start && prevSelection.end <= mention.end;
         return !intersects;
       });
     } else {
       mentions = mentions.filter(mention => {
-        const intersects =
-          prevSelection.start > mention.start &&
-          prevSelection.end < mention.end;
+        const intersects = prevSelection.start > mention.start && prevSelection.end < mention.end;
         return !intersects;
       });
     }
@@ -133,7 +118,7 @@ export default function createMentionsHandler() {
         return {
           ...mention,
           start: mention.start + diff,
-          end: mention.end + diff
+          end: mention.end + diff,
         };
       } else {
         return mention;
@@ -177,7 +162,7 @@ export default function createMentionsHandler() {
 
   const extract: Render = text => {
     let prevEnd = 0;
-    let result = "";
+    let result = '';
     if (mentions.length === 0) {
       result += text;
     } else {
@@ -208,6 +193,6 @@ export default function createMentionsHandler() {
     rerender,
     extract,
     addRenderer,
-    addExtractor
+    addExtractor,
   };
 }

@@ -1,18 +1,18 @@
-import { Context, createContext, RefObject } from "react";
-import { TextInput } from "react-native";
-import { MentionsHandler } from "../utils/createMentionsHandler";
-import { SynchronizeHandler } from "../utils/createSynchronizeHandler";
+import { Context, createContext, MutableRefObject, RefObject } from 'react';
+import { TextInput } from 'react-native';
+import { MentionsHandler } from '../utils/createMentionsHandler';
+import { SynchronizeHandler } from '../utils/createSynchronizeHandler';
 
-const MentionInputContext = createContext({
-  input: "",
+const MentionInputContext = (createContext({
+  input: '',
   inputRef: null,
   syncHandler: null,
   mentionsHandler: null,
-}) as Context<{
+}) as unknown) as Context<{
   input: string;
-  inputRef: RefObject<TextInput>;
+  inputRef: MutableRefObject<TextInput>;
   syncHandler: SynchronizeHandler;
   mentionsHandler: MentionsHandler;
 }>;
 
-export default MentionInputContext
+export default MentionInputContext;
