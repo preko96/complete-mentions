@@ -101,10 +101,10 @@ export default function createMentionsHandler() {
         };
 
         const batchIntersectEnd =
-          batchedSelection.start < mention.end && batchedSelection.end > mention.end;
+          batchedSelection.start <= mention.end && batchedSelection.end >= mention.end;
 
         const batchIntersectBetween =
-          batchedSelection.start > mention.start && batchedSelection.end < mention.end;
+          batchedSelection.start >= mention.start && batchedSelection.end <= mention.end;
 
         return !(batchIntersectEnd || batchIntersectBetween);
       });
