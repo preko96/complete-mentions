@@ -11,6 +11,7 @@ import useMentionsHandler from '../../hooks/useMentionsHandler';
 import useSynchronizeHandler from '../../hooks/useSynchronizeHandler';
 import {
   NativeSyntheticEvent,
+  Platform,
   Text,
   TextInput,
   TextInputProps,
@@ -26,6 +27,7 @@ type MentionInputProps = TextInputProps & {
 };
 
 export default function MentionInput(props: PropsWithChildren<MentionInputProps>) {
+  const [extractedString, setExtractedString] = useState(props.value);
   const inputRef = useRef<TextInput>() as MutableRefObject<TextInput>;
   const {
     value,
@@ -59,6 +61,7 @@ export default function MentionInput(props: PropsWithChildren<MentionInputProps>
 
     mentionsHandler.on('render', setFormattedText);
     mentionsHandler.on('extract', text => {
+      setExtractedString(text);
       onExtractedStringChange && onExtractedStringChange(text);
     });
   }, []);
@@ -67,6 +70,22 @@ export default function MentionInput(props: PropsWithChildren<MentionInputProps>
     syncHandler.updateText(text);
     onChangeText && onChangeText(text);
   }
+
+  useEffect(() => {
+    // TODO: Instead of listening to onChangeText we might could listen for changes for the value...
+    if (value === '') {
+      setFormattedText('');
+      if (Platform.OS === 'android') {
+        syncHandler.updateSelection({ start: 0, end: extractedString.length });
+        syncHandler.updateText('');
+        syncHandler.updateSelection({ start: 0, end: 0 });
+      } else {
+        syncHandler.updateSelection({ start: 0, end: extractedString.length });
+        syncHandler.updateSelection({ start: 0, end: 0 });
+        syncHandler.updateText('');
+      }
+    }
+  }, [value]);
 
   function handleSelectionChange(event: NativeSyntheticEvent<TextInputSelectionChangeEventData>) {
     syncHandler.updateSelection(event.nativeEvent.selection);
