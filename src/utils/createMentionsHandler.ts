@@ -95,18 +95,18 @@ export default function createMentionsHandler() {
           return !(intersectStart || intersectEnd || intersectBetween);
         }
 
-        const batchedSelection = { start: selection.start, end: prevSelection.start };
-
-        const batchIntersectStart =
-          batchedSelection.start < mention.start && batchedSelection.end > mention.start;
+        const batchedSelection = {
+          start: Math.min(selection.start, prevSelection.start),
+          end: Math.max(selection.end, prevSelection.start),
+        };
 
         const batchIntersectEnd =
           batchedSelection.start < mention.end && batchedSelection.end > mention.end;
 
         const batchIntersectBetween =
-          batchedSelection.start >= mention.start && batchedSelection.end <= mention.end;
+          batchedSelection.start > mention.start && batchedSelection.end < mention.end;
 
-        return !(batchIntersectStart || batchIntersectEnd || batchIntersectBetween);
+        return !(batchIntersectEnd || batchIntersectBetween);
       });
     } else if (text.length < prevText.length) {
       mentions = mentions.filter(mention => {
