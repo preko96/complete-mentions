@@ -1,28 +1,30 @@
-import { ReactElement, ReactNode, useContext, useEffect, useState } from 'react';
+import { ReactElement, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import { CommitParam } from '../../utils/createTrackingHandler';
 import MentionInputContext from '../../context/mentionInputContext';
 import useTrackingHandler from '../../hooks/useTrackingHandler';
 import { Platform } from 'react-native';
 import { Mention, RenderMention } from '../../utils/createMentionsHandler';
 
+export type Commit = (params: Omit<CommitParam, 'text' | 'formatText'>) => void;
 type RenderProps = {
   tracking: boolean;
   keyword: string;
-  commit: (params: Omit<CommitParam, 'text' | 'formatText'>) => void;
+  commit: Commit;
 };
 
 type TagProps = {
   tag: string;
   renderText: RenderMention;
-  renderSuggestions: (params: RenderProps) => ReactNode;
+  extractString: (mention: Mention) => string;
+  renderSuggestions?: (params: RenderProps) => ReactNode;
   onStartTracking?: () => void;
   onStopTracking?: () => void;
   onKeywordChange?: (keyword: string) => void;
-  extractString: (mention: Mention) => string;
   formatText?: (text: string) => string;
+  extractCommit?: (commit: Commit) => void;
 };
 
-export default function Tag(props: TagProps): ReactElement {
+export default function Tag(props: TagProps): ReactElement | null {
   const {
     renderSuggestions,
     renderText,
@@ -32,6 +34,7 @@ export default function Tag(props: TagProps): ReactElement {
     onKeywordChange,
     extractString,
     formatText,
+    extractCommit,
   } = props;
 
   const { mentionsHandler, input, inputRef, syncHandler } = useContext(MentionInputContext);
@@ -132,13 +135,23 @@ export default function Tag(props: TagProps): ReactElement {
     });
   }, []);
 
-  const handleCommit = ({ name, id }: Omit<CommitParam, 'text'>) => {
-    trackingHandler.commit({ text: input, name, id, formatText });
-  };
+  const handleCommit = useCallback(
+    ({ name, id }: Omit<CommitParam, 'text'>) => {
+      trackingHandler.commit({ text: input, name, id, formatText });
+    },
+    [input, formatText],
+  );
 
-  return <ReactElement>renderSuggestions({
+  useEffect(() => {
+    if (extractCommit) {
+      extractCommit(handleCommit);
+    }
+  }, [handleCommit]);
+
+  if (!renderSuggestions) return null;
+  return renderSuggestions({
     commit: handleCommit,
     keyword,
     tracking,
-  });
+  }) as ReactElement;
 }
