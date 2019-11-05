@@ -93,7 +93,7 @@ export default function MentionInput(props: PropsWithChildren<MentionInputProps>
   }
 
   function handleInputRef(ref: TextInput) {
-    if (inputRef.current) inputRef.current = ref as TextInput;
+    inputRef.current = ref as TextInput;
     if (propInputRef) propInputRef.current = ref as TextInput;
   }
 

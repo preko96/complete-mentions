@@ -78,19 +78,25 @@ export default function Tag(props: TagProps): ReactElement | null {
           end: start + keyword.length,
         });
         syncHandler.updateText(slicedText);
-        syncHandler.updateSelection({ start: start - 1, end: start - 1 });
+        syncHandler.updateSelection({ start: start, end: start });
 
         syncHandler.updateText(text);
+
+        // TODO: check if FB fixed this...
+        // inputRef.current.setNativeProps({
+        //   selection: { start: start + extractedName.length, end: start + extractedName.length },
+        // });
+
         syncHandler.updateSelection({
-          start: start + extractedName.length,
-          end: start + extractedName.length,
+          start: start + keyword.length,
+          end: start + keyword.length,
         });
       } else {
         syncHandler.updateSelection({
           start: start,
           end: start + keyword.length,
         });
-        syncHandler.updateSelection({ start: start - 1, end: start - 1 });
+        syncHandler.updateSelection({ start: start, end: start });
         syncHandler.updateText(slicedText);
         syncHandler.updateSelection({
           start: start + extractedName.length,
@@ -110,13 +116,6 @@ export default function Tag(props: TagProps): ReactElement | null {
 
       mentionsHandler.rerender(text);
       mentionsHandler.extract(text);
-      //mentionsHandler
-      // on iOS it's behaves strange... also its snaps automatically
-      if (Platform.OS === 'android') {
-        inputRef.current.setNativeProps({
-          selection: { start: result.end, end: result.end },
-        });
-      }
     });
   }, []);
 
