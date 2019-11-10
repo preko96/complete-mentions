@@ -1,13 +1,18 @@
 {
-  "name": "complete-mentions",
-  "version": "1.0.7",
+  "name": "react-native-complete-mentions",
+  "version": "1.0.8",
   "description": "A complete mentions system for React Native apps",
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "react-native;mentions;tags"
+    "react",
+    "react-native",
+    "mentions",
+    "react-component",
+    "react-native-component",
+    "text-input"
   ],
   "author": "Istvan Orban",
   "license": "MIT",
