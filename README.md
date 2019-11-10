@@ -19,13 +19,13 @@ yarn add react-native-complete-mentions
 The package exports 2 components
 
 ```ts
-import { MentionInput, Tag } from 'react-mentions'
+import { MentionInput, Tag } from 'react-native-complete-mentions'
 ```
 
 `MentionInput` is the main component rendering the textarea control. It takes one or multiple `Mention` components as its children. Each `Tag` component represents a data source for a specific class of mentionable objects, such as users, template variables, issues, etc.
 
 ```tsx
-<MentionsInput value={this.state.value} onChangeText={this.handleChange}>
+<MentionInput value={this.state.value} onChangeText={this.handleChange}>
   <Tag
     trigger="@"
     renderSuggestions={this.renderUserSuggestion}
@@ -34,7 +34,7 @@ import { MentionInput, Tag } from 'react-mentions'
     tag="#"
     renderSuggestions={this.renderTagSuggestion}
   />
-</MentionsInput>
+</MentionInput>
 ```
 
 ## Configuration
