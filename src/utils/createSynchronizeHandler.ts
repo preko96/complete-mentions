@@ -1,5 +1,5 @@
-import { Selection } from './types';
 import { Platform } from 'react-native';
+import { Selection } from './types';
 
 export type SynchronizeHandler = {
   on: SynchronizeEvents;

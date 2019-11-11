@@ -1,4 +1,4 @@
-import { Context, createContext, MutableRefObject, RefObject } from 'react';
+import { Context, createContext, MutableRefObject } from 'react';
 import { TextInput } from 'react-native';
 import { MentionsHandler } from '../utils/createMentionsHandler';
 import { SynchronizeHandler } from '../utils/createSynchronizeHandler';

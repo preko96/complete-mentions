@@ -1,8 +1,8 @@
 import { ReactElement, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import { CommitParam } from '../../utils/createTrackingHandler';
 import MentionInputContext from '../../context/mentionInputContext';
 import useTrackingHandler from '../../hooks/useTrackingHandler';
-import { Platform } from 'react-native';
 import { Mention, RenderMention } from '../../utils/createMentionsHandler';
 
 export type Commit = (params: Omit<CommitParam, 'text' | 'formatText'>) => void;

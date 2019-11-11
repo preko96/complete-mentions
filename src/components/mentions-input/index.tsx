@@ -2,13 +2,10 @@ import React, {
   MutableRefObject,
   PropsWithChildren,
   ReactNode,
-  RefObject,
   useEffect,
   useRef,
   useState,
 } from 'react';
-import useMentionsHandler from '../../hooks/useMentionsHandler';
-import useSynchronizeHandler from '../../hooks/useSynchronizeHandler';
 import {
   NativeSyntheticEvent,
   Platform,
@@ -17,8 +14,9 @@ import {
   TextInputProps,
   TextInputSelectionChangeEventData,
 } from 'react-native';
+import useMentionsHandler from '../../hooks/useMentionsHandler';
+import useSynchronizeHandler from '../../hooks/useSynchronizeHandler';
 import MentionInputContext from '../../context/mentionInputContext';
-import { Selection } from '../../utils/types';
 
 type MentionInputProps = TextInputProps & {
   value: string;

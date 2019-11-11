@@ -52,9 +52,9 @@ Each data source is configured using a `Tag` component, which has the following 
 
 | Prop name        | Type                                                         | Default value                               | Description                                                                                                                                            |
 | ---------------- | ------------------------------------------------------------ | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| tag               |  string                                             | `'@'`                                       | Defines the char sequence upon which to trigger querying the data source                                                       
-| renderText        | function(mention): ReactTextNode                    | `null`                                      | Allows customizing how mentions are displayed. 
-| renderSuggestions | function ({ tracking, keyword, commit })            | `null`                                      | Allows customizing how mentions list are rendered (optional)                                                                   
+| tag               |  string                                             | `'@'`                                       | Defines the char sequence upon which to trigger querying the data source
+| renderText        | function(mention): ReactTextNode                    | `null`                                      | Allows customizing how mentions are displayed.
+| renderSuggestions | function ({ tracking, keyword, commit })            | `null`                                      | Allows customizing how mentions list are rendered (optional)
 | formatText        | function(string): string                            | `null`                                      | Allows customizing the mentioned text. (optional)
 | extractString     | function(mention): string                           | `null`                                      | Allows customizing the extracted string, for example ``extractString={mention => `@[${mention.name}](id:${mention.id})`}`` (optional)
 | extractCommit     | function(commit)                                    | `null`                                      | Allows you to extract the commit (insert new mention) functionality. (optional)
