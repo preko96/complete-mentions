@@ -22,7 +22,11 @@ function ClubSuggestion({ name, id, onPress }) {
   );
 }
 
-export default function App() {
+/*
+  This solution shows how to render multiple tags
+*/
+
+export default function Multiple() {
   const [value, setValue] = React.useState('');
   const [extractedValue, setExtractedValue] = React.useState('');
 

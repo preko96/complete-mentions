@@ -12,7 +12,12 @@ function UserSuggestion({ name, onPress }) {
     </TouchableOpacity>
   );
 }
-export default function App() {
+
+/*
+  This solution shows how to render tags
+*/
+
+export default function Single() {
   const [value, setValue] = React.useState('');
   const [extractedValue, setExtractedValue] = React.useState('');
 
