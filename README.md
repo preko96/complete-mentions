@@ -16,12 +16,6 @@ Or yarn:
 yarn add react-native-complete-mentions
 ```
 
-## Examples
-
-Expo Snack: https://snack.expo.io/@pr3k0/react-native-complete-mentions-examples
-
-Please find the examples under the `/examples` folder
-
 The package exports 2 components
 
 ```ts
@@ -36,6 +30,12 @@ import { MentionInput, Tag } from 'react-native-complete-mentions';
   <Tag tag="#" renderSuggestions={this.renderTagSuggestion} />
 </MentionInput>
 ```
+
+## Examples
+
+Expo Snack: https://snack.expo.io/@pr3k0/react-native-complete-mentions-examples
+
+Please find the examples under the `/examples` folder
 
 ## Configuration
 
