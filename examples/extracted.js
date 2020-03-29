@@ -62,6 +62,7 @@ export default function Extracted() {
           extractCommit={extractCommit}
           renderText={mention => <Text style={styles.userText}>{mention.name}</Text>}
           formatText={text => `@${text}`}
+          detectMentionsRegexp={/(?<data>@\[(?<name>[A-Za-z0-9_]*)\](?<id>[0-9]*))/}
           extractString={mention => `@[${mention.name}](id:${mention.id})`}
         />
       </MentionInput>
