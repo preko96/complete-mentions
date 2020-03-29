@@ -60,8 +60,10 @@ export default function createTrackingHandler(params: TrackingParams): TrackingH
       }
     } else {
       if (ranged) stopTracking();
-      else if (lastChar === ' ') stopTracking();
-      else if (selection.start - 1 < position) stopTracking();
+      else if (lastChar === params.tag) {
+        position = selection.start - 1;
+        trackingQueue = [true, ...trackingQueue];
+      } else if (selection.start - 1 < position) stopTracking();
     }
 
     if (tracking === trackingQueue[0]) trackingQueue = [tracking, ...trackingQueue];
@@ -76,7 +78,7 @@ export default function createTrackingHandler(params: TrackingParams): TrackingH
 
   const updateKeyword: GenericHandler = ({ text }) => {
     if (position !== -1) {
-      const match = /([^\s]+)/.exec(text.substr(position));
+      const match = new RegExp(`(.[^${params.tag}]+)`).exec(text.substr(position));
       if (!match) return;
       keyword = match[0];
       keywordChangeSubs.forEach(sub => {

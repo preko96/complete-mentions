@@ -14,8 +14,10 @@ export type SynchronizeParams = {
 };
 
 type SyncSub = (textBuffer: string[], selectionBuffer: Selection[]) => void;
+type InitialSyncSub = (text: string) => void;
 type SynchronizeEvents = {
   (type: 'sync', sub: SyncSub): void;
+  (type: 'initialsync', sub: InitialSyncSub): void;
 };
 
 type UpdateSelection = (selection: Selection) => void;
@@ -59,6 +61,9 @@ export default function createSynchronizeHandler(params: SynchronizeParams): Syn
   const on: SynchronizeEvents = (type, sub) => {
     if (type === 'sync') {
       syncSubs.push(sub);
+    } else if (type == 'initialsync') {
+      // As this is called on creating the components, need to wait for them to register everything
+      setTimeout(() => sub(textBuffer[0]));
     }
   };
 
