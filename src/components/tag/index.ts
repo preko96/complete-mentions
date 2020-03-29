@@ -20,6 +20,15 @@ type RenderProps = {
   commit: Commit;
 };
 
+type MentionRegexpMatch = {
+  index: number;
+  groups: {
+    data: string;
+    id: string;
+    name: string;
+  };
+};
+
 type TagProps = {
   tag: string;
   renderText: RenderMention;
@@ -136,10 +145,13 @@ export default function Tag(props: TagProps): ReactElement | null {
       let currentPart = text;
       let currentText = text;
       let startOffset = 0;
-      let match;
-      while ((match = currentPart.match(detectMentionsRegexp))) {
+      let match: MentionRegexpMatch = (currentPart.match(
+        detectMentionsRegexp,
+      ) as unknown) as MentionRegexpMatch;
+      while (match) {
         if (!match.groups || !match.groups.name || !match.groups.data) {
           console.error('Please supply valid regexp');
+          return;
         }
         const position = match.index + startOffset;
         const keyword = match.groups.data;
@@ -159,6 +171,7 @@ export default function Tag(props: TagProps): ReactElement | null {
         addMention(result);
         currentPart = right;
         startOffset = left.length + extractedName.length + 1;
+        match = (currentPart.match(detectMentionsRegexp) as unknown) as MentionRegexpMatch;
       }
     });
   }, []);
