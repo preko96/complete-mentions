@@ -22,6 +22,8 @@ type TagProps = {
   onKeywordChange?: (keyword: string) => void;
   formatText?: (text: string) => string;
   extractCommit?: (commit: Commit) => void;
+  detectMentionsRegexp: RegExp,
+  shouldUpdateInitialValue: boolean,
 };
 
 export default function Tag(props: TagProps): ReactElement | null {
@@ -36,6 +38,7 @@ export default function Tag(props: TagProps): ReactElement | null {
     formatText,
     extractCommit,
     detectMentionsRegexp,
+    shouldUpdateInitialValue,
   } = props;
 
   const { mentionsHandler, input, inputRef, syncHandler } = useContext(MentionInputContext);
@@ -103,7 +106,7 @@ export default function Tag(props: TagProps): ReactElement | null {
     });
   }, []);
 
-  const addMention = (result: Commitment) => {
+  const addMention = useCallback((result: Commitment) => {
     const { text, start, keyword, slicedText, id, name } = result;
     const extractedName = formatText ? formatText(name) : name;
     console.log('commit', text, start, keyword, slicedText, id, name, extractedName);
@@ -152,7 +155,7 @@ export default function Tag(props: TagProps): ReactElement | null {
 
     mentionsHandler.rerender(text);
     mentionsHandler.extract(text);
-  };
+  }, [shouldUpdateInitialValue]);
 
   useEffect(() => {
     trackingHandler.on('commit', addMention);
