@@ -1,6 +1,6 @@
 import { ReactElement, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
-import { CommitParam } from '../../utils/createTrackingHandler';
+import {Commitment, CommitParam} from '../../utils/createTrackingHandler';
 import MentionInputContext from '../../context/mentionInputContext';
 import useTrackingHandler from '../../hooks/useTrackingHandler';
 import { Mention, RenderMention } from '../../utils/createMentionsHandler';
@@ -35,6 +35,7 @@ export default function Tag(props: TagProps): ReactElement | null {
     extractString,
     formatText,
     extractCommit,
+    detectMentionsRegexp,
   } = props;
 
   const { mentionsHandler, input, inputRef, syncHandler } = useContext(MentionInputContext);
@@ -65,58 +66,96 @@ export default function Tag(props: TagProps): ReactElement | null {
         prevSelection,
       });
     });
+    if (!detectMentionsRegexp) {
+      return;
+    }
+    syncHandler.on('initialsync', (text: string) => {
+      if (!text) {
+        return;
+      }
+      let currentPart = text;
+      let currentText = text;
+      let startOffset = 0;
+      let match;
+      while ((match = currentPart.match(detectMentionsRegexp))) {
+        if (!match.groups || !match.groups.name || !match.groups.data) {
+          console.error('Please supply valid regexp');
+        }
+        const position = match?.index + startOffset;
+        const keyword = match.groups.data;
+        const left = currentText.slice(0, position);
+        const right = currentText.slice(position + keyword.length + 1);
+        const slicedText = left + ' ' + right;
+        const extractedName = formatText ? formatText(match.groups.name) : match.groups.name;
+        currentText = left + extractedName + ' ' + right;
+        const result = {
+          ...match.groups,
+          keyword,
+          slicedText,
+          text: currentText,
+          start: position,
+          end: position + match.groups.name.length,
+        };
+        addMention(result);
+        currentPart = right;
+        startOffset = left.length + extractedName.length + 1;
+      }
+    });
   }, []);
 
-  useEffect(() => {
-    trackingHandler.on('commit', result => {
-      const { text, start, keyword, slicedText, id, name } = result;
-      const extractedName = formatText ? formatText(name) : name;
+  const addMention = (result: Commitment) => {
+    const { text, start, keyword, slicedText, id, name } = result;
+    const extractedName = formatText ? formatText(name) : name;
+    console.log('commit', text, start, keyword, slicedText, id, name, extractedName);
 
-      if (Platform.OS === 'android') {
-        syncHandler.updateSelection({
-          start: start,
-          end: start + keyword.length,
-        });
-        syncHandler.updateText(slicedText);
-        syncHandler.updateSelection({ start: start, end: start });
-
-        syncHandler.updateText(text);
-
-        // TODO: check if FB fixed this...
-        // inputRef.current.setNativeProps({
-        //   selection: { start: start + extractedName.length, end: start + extractedName.length },
-        // });
-
-        syncHandler.updateSelection({
-          start: start + keyword.length,
-          end: start + keyword.length,
-        });
-      } else {
-        syncHandler.updateSelection({
-          start: start,
-          end: start + keyword.length,
-        });
-        syncHandler.updateSelection({ start: start, end: start });
-        syncHandler.updateText(slicedText);
-        syncHandler.updateSelection({
-          start: start + extractedName.length,
-          end: start + extractedName.length,
-        });
-        syncHandler.updateText(text);
-      }
-
-      mentionsHandler.addMention({
-        start,
-        end: start + extractedName.length,
-        name: extractedName,
-        value: name,
-        id,
-        tag,
+    if (Platform.OS === 'android') {
+      syncHandler.updateSelection({
+        start: start,
+        end: start + keyword.length,
       });
+      syncHandler.updateText(slicedText);
+      syncHandler.updateSelection({ start: start, end: start });
 
-      mentionsHandler.rerender(text);
-      mentionsHandler.extract(text);
+      syncHandler.updateText(text);
+
+      // TODO: check if FB fixed this...
+      // inputRef.current.setNativeProps({
+      //   selection: { start: start + extractedName.length, end: start + extractedName.length },
+      // });
+
+      syncHandler.updateSelection({
+        start: start + keyword.length,
+        end: start + keyword.length,
+      });
+    } else {
+      syncHandler.updateSelection({
+        start: start,
+        end: start + keyword.length,
+      });
+      syncHandler.updateSelection({ start: start, end: start });
+      syncHandler.updateText(slicedText);
+      syncHandler.updateSelection({
+        start: start + extractedName.length,
+        end: start + extractedName.length,
+      });
+      syncHandler.updateText(text);
+    }
+
+    mentionsHandler.addMention({
+      start,
+      end: start + extractedName.length,
+      name: extractedName,
+      value: name,
+      id,
+      tag,
     });
+
+    mentionsHandler.rerender(text);
+    mentionsHandler.extract(text);
+  };
+
+  useEffect(() => {
+    trackingHandler.on('commit', addMention);
   }, []);
 
   useEffect(() => {
